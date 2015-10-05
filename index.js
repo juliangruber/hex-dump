@@ -2,11 +2,11 @@ module.exports = Dump;
 
 function Dump(buf){
   this._buf = buf;
-  this._el = this._render();
+  this._el = null;
 }
 
 Dump.prototype.appendTo = function(el){
-  el.appendChild(this._el);
+  el.appendChild(this._el = this._el || this._render());
 };
 
 Dump.prototype._render = function(){
