@@ -3,6 +3,11 @@ module.exports = Dump;
 function Dump(buf){
   this._buf = buf;
   this._el = null;
+  this._gutterWidth = 4;
+  this._offsetWidth = Math.max(buf.length.toString(16).length, 6);
+  this._lineWidth = this._offsetWidth
+    + 2 * this._gutterWidth
+    + 4 * 16;
 }
 
 Dump.prototype.appendTo = function(el){
@@ -13,12 +18,11 @@ Dump.prototype._render = function(){
   var pre = document.createElement('pre');
   var buf = this._buf;
   var lines = Math.ceil(buf.length / 16);
-  var offsetWidth = Math.max(buf.length.toString(16).length, 6);
   var out = '';
 
   for (var i = 0; i < lines; i++) {
     var offset = i * 16;
-    out += pad(offset, offsetWidth);
+    out += pad(offset, this._offsetWidth);
     out += this._gutter();
     
     var off = Number(offset);
@@ -50,12 +54,35 @@ Dump.prototype._render = function(){
 };
 
 Dump.prototype._gutter = function(){
-  return spaces(4);
+  return spaces(this._gutterWidth);
 };
 
 Dump.prototype._printable = function(v){
   return v > 31 && v < 127 || v > 159;
 };
+
+Dump.prototype.getSelection = function(){
+  var sel = getSelection();
+  if (sel.type != 'Range' || sel.anchorNode.parentNode != this._el) return;
+
+  var start = {};
+  start.offset = Math.min(sel.baseOffset, sel.extentOffset);
+  start.line = Math.floor(start.offset / this._lineWidth);
+  start.lineOffset = cap(0, 3 * 16, start.offset % (this._lineWidth + 1 /* \n */) - this._offsetWidth - this._gutterWidth);
+  start.idx = Math.ceil((start.line * 16 + (start.lineOffset / 3)));
+
+  var end = {};
+  end.offset = Math.max(sel.baseOffset, sel.extentOffset);
+  end.line = Math.floor(end.offset / (this._lineWidth));
+  end.lineOffset = cap(0, 3 * 16, end.offset % (this._lineWidth + 1 /* \n */) - this._offsetWidth - this._gutterWidth - 1);
+  end.idx = Math.ceil((end.line * 16 + (end.lineOffset / 3)));
+
+  return this._buf.slice(start.idx, end.idx);
+};
+
+function cap(min, max, num){
+  return Math.min(max, Math.max(min, num));
+}
 
 function pad(num, max){
   var out = num.toString(16);

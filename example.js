@@ -1,7 +1,7 @@
 var Dump = require('./');
 var bytes = require('bytes');
 
-var size = '1mb';
+var size = '512kb';
 
 var len = bytes(size);
 var b = new Buffer(len);
@@ -13,5 +13,6 @@ var start = Date.now();
 
 var d = new Dump(b);
 d.appendTo(document.body);
+window.d = d;
 
 console.log('Took %s ms for %s', Date.now() - start, size);
