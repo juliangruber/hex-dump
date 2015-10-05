@@ -1,7 +1,7 @@
 var Dump = require('./');
 var bytes = require('bytes');
 
-var size = '10kb';
+var size = '1mb';
 
 var len = bytes(size);
 var b = new Buffer(len);
