@@ -18,46 +18,46 @@ Dump.prototype.appendTo = function(el){
 Dump.prototype._render = function(){
   var self = this;
   var pre = document.createElement('pre');
-  var store = this._store;
   var lines = Math.ceil(this._length / 16);
   var out = '';
 
   (function next(i){
-    var offset = i * 16;
-    out += pad(offset, self._offsetWidth);
-    out += self._gutter();
-   
-    store.get(i, { length: 16 }, function(err, buf){
+    self._store.get(i, { length: 16 }, function(err, buf){
       if (err) throw err;
 
-      for (var j = 0; j < 16; j++) {
-        if (buf.length < j) {
-          out += spaces((16 - j) * 3);
-          break;
-        }
-        out += pad(buf[j], 2) + ' ';
-      }
-      out += self._gutter();
-
-      for (var j = 0; j < 16; j++) {
-        if (buf.length < j) break;
-        var v = buf[j];
-        out += self._printable(v)
-          ? String.fromCharCode(v)
-          : '.';
-      }
-
-      out += '\n';
-
-      if (++i < lines) {
-        next(i);  
-      } else {
-        pre.innerHTML = out;
-      }
+      out += self._renderLine(i, buf);
+      if (++i < lines) next(i);
+      else pre.innerHTML = out;
     });
   })(0);
 
   return pre;
+};
+
+Dump.prototype._renderLine = function(line, buf, out){
+  var out = '';
+  var offset = line * 16;
+  out += pad(offset, this._offsetWidth);
+  out += this._gutter();
+ 
+  for (var j = 0; j < 16; j++) {
+    if (buf.length < j) {
+      out += spaces((16 - j) * 3);
+      break;
+    }
+    out += pad(buf[j], 2) + ' ';
+  }
+  out += this._gutter();
+
+  for (var j = 0; j < 16; j++) {
+    if (buf.length < j) break;
+    var v = buf[j];
+    out += this._printable(v)
+      ? String.fromCharCode(v)
+      : '.';
+  }
+
+  return out + '\n';
 };
 
 Dump.prototype._gutter = function(){
