@@ -14,36 +14,38 @@ Dump.prototype._render = function(){
   var buf = this._buf;
   var lines = Math.ceil(buf.length / 16);
   var offsetWidth = Math.max(buf.length.toString(16).length, 6);
+  var out = '';
 
   for (var i = 0; i < lines; i++) {
     var offset = i * 16;
-    pre.innerHTML += pad(offset, offsetWidth);
-    pre.innerHTML += this._gutter();
+    out += pad(offset, offsetWidth);
+    out += this._gutter();
     
     var off = Number(offset);
     for (var j = 0; j < 16; j++) {
       if (buf.length < off) {
-        pre.innerHTML += spaces((16 - j) * 3);
+        out += spaces((16 - j) * 3);
         break;
       }
-      pre.innerHTML += pad(buf[off], 2) + ' ';
+      out += pad(buf[off], 2) + ' ';
       off++;
     }
-    pre.innerHTML += this._gutter();
+    out += this._gutter();
 
     off = Number(offset);
     for (var j = 0; j < 16; j++) {
       if (buf.length < off) break;
       var v = buf[off];
-      pre.innerHTML += this._printable(v)
+      out += this._printable(v)
         ? String.fromCharCode(v)
         : '.';
       off++;
     }
 
-    pre.innerHTML += '\n';
+    out += '\n';
   }
 
+  pre.innerHTML = out;
   return pre;
 };
 
