@@ -1,14 +1,15 @@
 
 # hex-dump
 
-  
+  Simplisitc hex dump for browsers.
 
 ## Example
 
 ```js
-var hex-dump = require('hex-dump');
+var Dump = require('hex-dump');
 
-
+var d = new Dump(buffer);
+d.appendTo(document.body);
 ```
 
 ## Installation
