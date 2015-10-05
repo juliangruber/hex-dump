@@ -5,6 +5,8 @@
 
 ## Example
 
+  [![view on requirebin](http://requirebin.com/badge.png)](http://requirebin.com/?gist=2faedc03efbc1e973d09)
+
 ```js
 var Dump = require('hex-dump');
 
