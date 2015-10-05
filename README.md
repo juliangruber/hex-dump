@@ -10,7 +10,7 @@
 ```js
 var Dump = require('hex-dump');
 
-var d = new Dump(buffer);
+var d = new Dump(chunks);
 d.appendTo(document.body);
 ```
 

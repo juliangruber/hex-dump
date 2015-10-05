@@ -1,10 +1,11 @@
 module.exports = Dump;
 
-function Dump(buf){
-  this._buf = buf;
+function Dump(store, length){
+  this._store = store;
+  this._length = length;
   this._el = null;
   this._gutterWidth = 4;
-  this._offsetWidth = Math.max(buf.length.toString(16).length, 6);
+  this._offsetWidth = Math.max(length.toString(16).length, 6);
   this._lineWidth = this._offsetWidth
     + 2 * this._gutterWidth
     + 4 * 16;
@@ -15,41 +16,47 @@ Dump.prototype.appendTo = function(el){
 };
 
 Dump.prototype._render = function(){
+  var self = this;
   var pre = document.createElement('pre');
-  var buf = this._buf;
-  var lines = Math.ceil(buf.length / 16);
+  var store = this._store;
+  var lines = Math.ceil(this._length / 16);
   var out = '';
 
-  for (var i = 0; i < lines; i++) {
+  (function next(i){
     var offset = i * 16;
-    out += pad(offset, this._offsetWidth);
-    out += this._gutter();
-    
-    var off = Number(offset);
-    for (var j = 0; j < 16; j++) {
-      if (buf.length < off) {
-        out += spaces((16 - j) * 3);
-        break;
+    out += pad(offset, self._offsetWidth);
+    out += self._gutter();
+   
+    store.get(i, { length: 16 }, function(err, buf){
+      if (err) throw err;
+
+      for (var j = 0; j < 16; j++) {
+        if (buf.length < j) {
+          out += spaces((16 - j) * 3);
+          break;
+        }
+        out += pad(buf[j], 2) + ' ';
       }
-      out += pad(buf[off], 2) + ' ';
-      off++;
-    }
-    out += this._gutter();
+      out += self._gutter();
 
-    off = Number(offset);
-    for (var j = 0; j < 16; j++) {
-      if (buf.length < off) break;
-      var v = buf[off];
-      out += this._printable(v)
-        ? String.fromCharCode(v)
-        : '.';
-      off++;
-    }
+      for (var j = 0; j < 16; j++) {
+        if (buf.length < j) break;
+        var v = buf[j];
+        out += self._printable(v)
+          ? String.fromCharCode(v)
+          : '.';
+      }
 
-    out += '\n';
-  }
+      out += '\n';
 
-  pre.innerHTML = out;
+      if (++i < lines) {
+        next(i);  
+      } else {
+        pre.innerHTML = out;
+      }
+    });
+  })(0);
+
   return pre;
 };
 
