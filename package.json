@@ -1,6 +1,6 @@
 {
   "name": "hex-dump",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Simplistic hex dumps for browsers",
   "scripts": {
     "test": "make test"
