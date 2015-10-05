@@ -26,10 +26,10 @@ Dump.prototype._render = function(){
         pre.innerHTML += spaces((16 - j) * 3);
         break;
       }
-      pre.innerHTML += buf[offset].toString(16) + ' ';
+      pre.innerHTML += pad(buf[off], 2) + ' ';
       off++;
     }
-    this._gutter();
+    pre.innerHTML += this._gutter();
 
     off = Number(offset);
     for (var j = 0; j < 16; j++) {
