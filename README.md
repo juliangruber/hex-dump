@@ -10,7 +10,7 @@
 ```js
 var Dump = require('hex-dump');
 
-var d = new Dump(chunks);
+var d = new Dump(chunks, length);
 d.appendTo(document.body);
 ```
 
@@ -19,6 +19,15 @@ d.appendTo(document.body);
 ```bash
 $ npm install hex-dump
 ```
+
+## API
+
+### Dump(chunks, length)
+
+  - `chunks` instance of [abstract-chunk-store](https://npmjs.org/package/abstract-chunk-store). The most efficient chunk size to use is `16`.
+  - `length` of the content
+
+### #appendTo(el)
 
 ## License
 
