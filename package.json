@@ -11,5 +11,8 @@
     "bytes": "^2.1.0",
     "memory-chunk-store": "^1.2.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "chunk-store-multi-get": "^1.0.0"
+  }
 }

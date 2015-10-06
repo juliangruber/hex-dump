@@ -1,3 +1,5 @@
+var get = require('chunk-store-multi-get');
+
 module.exports = Dump;
 
 function Dump(store, length){
@@ -18,18 +20,22 @@ Dump.prototype.appendTo = function(el){
 Dump.prototype._render = function(){
   var self = this;
   var pre = document.createElement('pre');
-  var lines = Math.ceil(this._length / 16);
+  var lines = 500;
   var out = '';
 
-  (function next(i){
-    self._store.get(i, { length: 16 }, function(err, buf){
-      if (err) throw err;
+  get(this._store, {
+    chunkLength: 16,
+    index: 0,
+    length: lines * 16
+  }, function(err, buf){
+    if (err) throw err;
 
-      out += self._renderLine(i, buf);
-      if (++i < lines) next(i);
-      else pre.innerHTML = out;
-    });
-  })(0);
+    for (var i = 0; i < lines; i++) {
+      var offset = i * 16;
+      out += self._renderLine(i, buf.slice(offset, offset + 16));
+    }
+    pre.innerHTML = out;
+  });
 
   return pre;
 };
