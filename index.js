@@ -55,6 +55,7 @@ Dump.prototype._renderLine = function(line, buf, out){
     out += this._printable(v)
       ? String.fromCharCode(v)
       : '.';
+    out += ' ';
   }
 
   return out + '\n';
@@ -65,7 +66,7 @@ Dump.prototype._gutter = function(){
 };
 
 Dump.prototype._printable = function(v){
-  return v > 31 && v < 127 || v > 159;
+  return v >= 32 && v <= 126;
 };
 
 Dump.prototype.getSelection = function(){
