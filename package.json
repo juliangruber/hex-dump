@@ -9,7 +9,8 @@
   "devDependencies": {
     "beefy": "^2.1.5",
     "bytes": "^2.1.0",
-    "memory-chunk-store": "^1.2.0"
+    "memory-chunk-store": "^1.2.0",
+    "random-buffer": "^0.1.0"
   },
   "license": "MIT"
 }
