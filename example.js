@@ -4,7 +4,7 @@ var Mem = require('memory-chunk-store');
 var shannon = require('binary-shannon-entropy');
 var random = require('entropy-buffer');
 
-var size = '1kb';
+var size = '10kb';
 
 var len = bytes(size);
 var chunks = Mem(16);
