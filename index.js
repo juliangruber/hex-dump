@@ -2,6 +2,7 @@ var shannon = require('binary-shannon-entropy');
 var Bar = require('colorcoded-bar');
 var insertCSS = require('insert-css');
 var fs = require('fs');
+var GenericDump = require('generic-hex-dump');
 
 var style = fs.readFileSync(__dirname + '/style.css', 'utf8');
 
@@ -11,10 +12,12 @@ function Dump(store, length){
   insertCSS(style);
 
   this._store = store;
-  this._length = length;
+  this._generic = new GenericDump(length);
+  this._length = length; /* TODO */
   this._el = null;
   this._gutterWidth = 4;
-  this._offsetWidth = Math.max(length.toString(16).length, 6);
+  this._offsetWidth = this._generic.offsetWidth();
+  this._lines = this._generic.lines();
   this._lineWidth = this._offsetWidth
     + 2 * this._gutterWidth
     + 4 * 16;
@@ -40,7 +43,6 @@ Dump.prototype._render = function(height){
   var pre = document.createElement('pre');
   pre.classList.add('hex');
 
-  var lines = Math.ceil(this._length / 16);
   var out = '';
 
   (function next(i){
@@ -50,7 +52,7 @@ Dump.prototype._render = function(height){
       self._renderBar(bar, canvas, height, i, buf);
       out += self._renderHex(i, buf);
 
-      if (++i < lines) next(i);
+      if (++i < self._lines) next(i);
       else pre.innerHTML = out;
     });
   })(0);
@@ -68,39 +70,15 @@ Dump.prototype._renderBar = function(bar, canvas, height, line, buf){
 };
 
 Dump.prototype._renderHex = function(line, buf){
-  var out = '';
-
-  var offset = line * 16;
-  out += pad(offset, this._offsetWidth);
-  out += this._gutter();
- 
-  for (var j = 0; j < 16; j++) {
-    if (buf.length < j) {
-      out += spaces((16 - j) * 3);
-      break;
-    }
-    out += pad(buf[j], 2) + ' ';
-  }
-  out += this._gutter();
-
-  for (var j = 0; j < 16; j++) {
-    if (buf.length < j) break;
-    var v = buf[j];
-    out += this._printable(v)
-      ? String.fromCharCode(v)
-      : '.';
-    out += ' ';
-  }
-
-  return out + '\n';
+  return [
+    this._generic.offset(line),
+    this._generic.hex(buf).join(' '),
+    this._generic.strings(buf).join(' ')
+  ].join(this._gutter()) + '\n';
 };
 
 Dump.prototype._gutter = function(){
   return spaces(this._gutterWidth);
-};
-
-Dump.prototype._printable = function(v){
-  return v >= 32 && v <= 126;
 };
 
 Dump.prototype.getSelection = function(){
@@ -124,12 +102,6 @@ Dump.prototype.getSelection = function(){
 
 function cap(min, max, num){
   return Math.min(max, Math.max(min, num));
-}
-
-function pad(num, max){
-  var out = num.toString(16);
-  while (out.length < max) out = '0' + out;
-  return out;
 }
 
 function spaces(n){
