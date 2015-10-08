@@ -1,9 +1,9 @@
 var shannon = require('binary-shannon-entropy');
-var Bar = require('colorcoded-bar');
 var insertCSS = require('insert-css');
 var fs = require('fs');
 var GenericDump = require('generic-hex-dump');
 var h = require('hyperscript');
+var renderBar = require('./lib/bar');
 
 var style = fs.readFileSync(__dirname + '/style.css', 'utf8');
 
@@ -34,32 +34,33 @@ Dump.prototype._render = function(height){
   var canvas = h('canvas');
   var pre = h('pre.hex');
 
-  var bar = new Bar();
+  var bar = renderBar(height, this._lines, function(i, cb){
+    self._store.get(i, { length: 16 }, function(err, buf){
+      if (err) return cb(err);
+
+      var entropy = shannon(buf); // 0 -> 4
+      var color = 'rgba(1, 1, 1, ' + (entropy / 4) + ')';
+      cb(null, color);
+    });
+  });
+
   var out = '';
 
   (function next(i){
     self._store.get(i, { length: 16 }, function(err, buf){
       if (err) throw err;
 
-      self._renderBar(bar, canvas, height, i, buf);
       out += self._renderHex(i, buf);
 
-      if (++i < self._lines) next(i);
-      else pre.innerHTML = out;
+      if (++i < self._lines) {
+        next(i);
+      } else {
+        pre.innerHTML = out;
+      }
     });
   })(0);
 
-  return h('div.dump',
-    h('div.entropy', canvas),
-    pre
-  );
-};
-
-Dump.prototype._renderBar = function(bar, canvas, height, line, buf){
-  var entropy = shannon(buf); // 0 -> 4
-  var color = 'rgba(1, 1, 1, ' + (entropy / 4) + ')';
-  bar.set(line, color);
-  bar.render({ canvas: canvas, height: height });
+  return h('div.dump', bar, pre);
 };
 
 Dump.prototype._renderHex = function(line, buf){
