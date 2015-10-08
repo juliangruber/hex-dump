@@ -3,6 +3,7 @@ var Bar = require('colorcoded-bar');
 var insertCSS = require('insert-css');
 var fs = require('fs');
 var GenericDump = require('generic-hex-dump');
+var h = require('hyperscript');
 
 var style = fs.readFileSync(__dirname + '/style.css', 'utf8');
 
@@ -31,18 +32,10 @@ Dump.prototype.appendTo = function(el){
 Dump.prototype._render = function(height){
   var self = this;
 
-  var el = document.createElement('div');
-  el.classList.add('dump');
+  var canvas = h('canvas');
+  var pre = h('pre.hex');
 
-  var barEl = document.createElement('div');
-  var canvas = document.createElement('canvas');
-  barEl.classList.add('entropy');
-  barEl.appendChild(canvas);
   var bar = new Bar();
-
-  var pre = document.createElement('pre');
-  pre.classList.add('hex');
-
   var out = '';
 
   (function next(i){
@@ -57,9 +50,10 @@ Dump.prototype._render = function(height){
     });
   })(0);
 
-  el.appendChild(barEl);
-  el.appendChild(pre);
-  return el;
+  return h('div.dump',
+    h('div.entropy', canvas),
+    pre
+  );
 };
 
 Dump.prototype._renderBar = function(bar, canvas, height, line, buf){
