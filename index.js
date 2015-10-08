@@ -26,39 +26,16 @@ Dump.prototype.appendTo = function(el){
 };
 
 Dump.prototype._render = function(height){
+  var self = this;
+
   var el = document.createElement('div');
   el.classList.add('dump');
-  el.appendChild(this._renderBar(height));
-  el.appendChild(this._renderHex());
-  return el;
-};
 
-Dump.prototype._renderBar = function(height){
-  var self = this;
-  var el = document.createElement('div');
-  el.classList.add('entropy');
+  var barEl = document.createElement('div');
   var canvas = document.createElement('canvas');
-  var lines = Math.ceil(this._length / 16);
+  barEl.classList.add('entropy');
+  barEl.appendChild(canvas);
   var bar = new Bar();
-
-  (function next(i){
-    self._store.get(i, { length: 16 }, function(err, buf){
-      if (err) throw err;
-
-      var entropy = shannon(buf); // 0 -> 4
-      var color = 'rgba(1, 1, 1, ' + (entropy / 4) + ')';
-      bar.set(i, color);
-      bar.render({ canvas: canvas, height: height });
-      if (++i < lines) next(i);
-    });
-  })(0);
-
-  el.appendChild(canvas);
-  return el;
-};
-
-Dump.prototype._renderHex = function(){
-  var self = this;
 
   var pre = document.createElement('pre');
   pre.classList.add('hex');
@@ -70,16 +47,27 @@ Dump.prototype._renderHex = function(){
     self._store.get(i, { length: 16 }, function(err, buf){
       if (err) throw err;
 
-      out += self._renderLine(i, buf);
+      self._renderBar(bar, canvas, height, i, buf);
+      out += self._renderHex(i, buf);
+
       if (++i < lines) next(i);
       else pre.innerHTML = out;
     });
   })(0);
 
-  return pre;
+  el.appendChild(barEl);
+  el.appendChild(pre);
+  return el;
 };
 
-Dump.prototype._renderLine = function(line, buf){
+Dump.prototype._renderBar = function(bar, canvas, height, line, buf){
+  var entropy = shannon(buf); // 0 -> 4
+  var color = 'rgba(1, 1, 1, ' + (entropy / 4) + ')';
+  bar.set(line, color);
+  bar.render({ canvas: canvas, height: height });
+};
+
+Dump.prototype._renderHex = function(line, buf){
   var out = '';
 
   var offset = line * 16;
