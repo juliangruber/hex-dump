@@ -5,7 +5,7 @@
 
 ## Example
 
-  [![view on requirebin](http://requirebin.com/badge.png)](http://requirebin.com/?gist=2faedc03efbc1e973d09)
+  ![screenshot](screenshot.png)
 
 ```js
 var Dump = require('hex-dump');
@@ -13,6 +13,8 @@ var Dump = require('hex-dump');
 var d = new Dump(chunks, length);
 d.appendTo(document.body);
 ```
+
+  [![view on requirebin](http://requirebin.com/badge.png)](http://requirebin.com/?gist=2faedc03efbc1e973d09)
 
 ## Installation
 
