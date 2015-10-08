@@ -14,7 +14,6 @@ function Dump(store, length){
 
   this._store = store;
   this._generic = new GenericDump(length);
-  this._length = length; /* TODO */
   this._el = null;
   this._gutterWidth = 4;
   this._offsetWidth = this._generic.offsetWidth();
