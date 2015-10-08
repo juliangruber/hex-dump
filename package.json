@@ -8,9 +8,16 @@
   "repository": "juliangruber/hex-dump",
   "devDependencies": {
     "beefy": "^2.1.5",
+    "brfs": "^1.4.1",
     "bytes": "^2.1.0",
+    "entropy-buffer": "^1.0.0",
     "memory-chunk-store": "^1.2.0",
     "random-buffer": "^0.1.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "binary-shannon-entropy": "^1.1.2",
+    "colorcoded-bar": "^2.3.0",
+    "insert-css": "^0.2.0"
+  }
 }

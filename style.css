@@ -1,0 +1,17 @@
+.dump {
+  position: relative;
+  height: 100%;
+}
+
+.dump .entropy {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+
+.dump .hex {
+  overflow: auto;
+  height: 100%;
+  margin-left: 150px;
+}

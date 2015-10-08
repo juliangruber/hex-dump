@@ -1,6 +1,15 @@
+var shannon = require('binary-shannon-entropy');
+var Bar = require('colorcoded-bar');
+var insertCSS = require('insert-css');
+var fs = require('fs');
+
+var style = fs.readFileSync(__dirname + '/style.css', 'utf8');
+
 module.exports = Dump;
 
 function Dump(store, length){
+  insertCSS(style);
+
   this._store = store;
   this._length = length;
   this._el = null;
@@ -12,12 +21,48 @@ function Dump(store, length){
 }
 
 Dump.prototype.appendTo = function(el){
-  el.appendChild(this._el = this._el || this._render());
+  var height = el.getClientRects()[0].height;
+  el.appendChild(this._render(height));
 };
 
-Dump.prototype._render = function(){
+Dump.prototype._render = function(height){
+  var el = document.createElement('div');
+  el.classList.add('dump');
+  el.appendChild(this._renderBar(height));
+  el.appendChild(this._renderHex());
+  return el;
+};
+
+Dump.prototype._renderBar = function(height){
   var self = this;
+  var el = document.createElement('div');
+  el.classList.add('entropy');
+  var canvas = document.createElement('canvas');
+  var lines = Math.ceil(this._length / 16);
+  var bar = new Bar();
+
+  (function next(i){
+    self._store.get(i, { length: 16 }, function(err, buf){
+      if (err) throw err;
+
+      var entropy = shannon(buf); // 0 -> 4
+      var color = 'rgba(1, 1, 1, ' + (entropy / 4) + ')';
+      bar.set(i, color);
+      bar.render({ canvas: canvas, height: height });
+      if (++i < lines) next(i);
+    });
+  })(0);
+
+  el.appendChild(canvas);
+  return el;
+};
+
+Dump.prototype._renderHex = function(){
+  var self = this;
+
   var pre = document.createElement('pre');
+  pre.classList.add('hex');
+
   var lines = Math.ceil(this._length / 16);
   var out = '';
 
@@ -34,8 +79,9 @@ Dump.prototype._render = function(){
   return pre;
 };
 
-Dump.prototype._renderLine = function(line, buf, out){
+Dump.prototype._renderLine = function(line, buf){
   var out = '';
+
   var offset = line * 16;
   out += pad(offset, this._offsetWidth);
   out += this._gutter();
