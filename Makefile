@@ -1,6 +1,6 @@
 
-example:
-	@node_modules/.bin/beefy example.js -- -t brfs
+example-simple:
+	@node_modules/.bin/beefy example/simple.js -- -t brfs
 
-.PHONY: example
+.PHONY: example-simple
 
