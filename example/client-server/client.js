@@ -10,6 +10,6 @@ var el = document.createElement('div');
 el.style.height = '600px';
 document.body.appendChild(el);
 
-var d = new Dump(store, 1000 * 16);
+var d = new Dump(store, 10000 * 16);
 d.appendTo(el);
 
