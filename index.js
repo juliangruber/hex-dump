@@ -63,11 +63,15 @@ Dump.prototype._render = function(height){
       if (err) throw err;
 
       out += self._renderHex(i, buf);
+      if (i % 5 == 0) {
+        pre.innerHTML += out;
+        out = '';
+      }
 
       if (++i < self._lines) {
         next(i);
       } else {
-        pre.innerHTML = out;
+        pre.innerHTML += out;
       }
     });
   })(0);

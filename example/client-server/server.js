@@ -6,7 +6,7 @@ var websocket = require('websocket-stream');
 
 var store = new Store(16);
 
-for (var i = 0; i < 1000; i++) {
+for (var i = 0; i < 10000; i++) {
   store.put(i, Buffer(16), function(err){
     if (err) throw err;
   });
