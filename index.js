@@ -3,7 +3,9 @@ var insertCSS = require('insert-css');
 var fs = require('fs');
 var GenericDump = require('generic-hex-dump');
 var h = require('hyperscript');
-var renderBar = require('./lib/bar');
+var Bar = require('colorcoded-bar');
+var fill = require('fill-colorcoded-bar');
+var raf = require('raf');
 
 var style = fs.readFileSync(__dirname + '/style.css', 'utf8');
 
@@ -33,8 +35,13 @@ Dump.prototype._render = function(height){
 
   var canvas = h('canvas');
   var pre = h('pre.hex');
+  var barEl = h('div.entropy', canvas);
 
-  var bar = renderBar(height, this._lines, function(i, cb){
+  var bar = new Bar;
+  var status = fill(bar, {
+    length: this._lines,
+    strategy: 'refine'
+  }, function(i, cb){
     self._store.get(i, { length: 16 }, function(err, buf){
       if (err) return cb(err);
 
@@ -43,6 +50,11 @@ Dump.prototype._render = function(height){
       cb(null, color);
     });
   });
+
+  (function draw(){
+    bar.render({ canvas: canvas, height: height });
+    if (status.fetching) raf(draw);
+  })();
 
   var out = '';
 
@@ -60,7 +72,7 @@ Dump.prototype._render = function(height){
     });
   })(0);
 
-  return h('div.dump', bar, pre);
+  return h('div.dump', barEl, pre);
 };
 
 Dump.prototype._renderHex = function(line, buf){
