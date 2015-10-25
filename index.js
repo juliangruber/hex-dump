@@ -20,9 +20,11 @@ function Dump(store, length){
   this._gutterWidth = 4;
   this._offsetWidth = this._generic.offsetWidth();
   this._lines = this._generic.lines();
+  this._length = length;
   this._lineWidth = this._offsetWidth
     + 2 * this._gutterWidth
     + 4 * 16;
+  this._lastChunkLength = length % 16 || 16;
 }
 
 Dump.prototype.appendTo = function(el){
@@ -42,7 +44,7 @@ Dump.prototype._render = function(height){
     length: this._lines,
     strategy: 'refine'
   }, function(i, cb){
-    self._store.get(i, { length: 16 }, function(err, buf){
+    self._store.get(i, { length: self._lineLength(i) }, function(err, buf){
       if (err) return cb(err);
 
       var entropy = shannon(buf); // 0 -> 4
@@ -59,7 +61,7 @@ Dump.prototype._render = function(height){
   var out = '';
 
   (function next(i){
-    self._store.get(i, { length: 16 }, function(err, buf){
+    self._store.get(i, { length: self._lineLength(i) }, function(err, buf){
       if (err) throw err;
 
       out += self._renderHex(i, buf);
@@ -108,6 +110,12 @@ Dump.prototype.getSelection = function(){
   end.idx = Math.ceil((end.line * 16 + (end.lineOffset / 3)));
 
   return this._buf.slice(start.idx, end.idx);
+};
+
+Dump.prototype._lineLength = function(i){
+  return i == (this._lines - 1)
+    ? this._lastChunkLength
+    : 16;
 };
 
 function cap(min, max, num){
