@@ -5,5 +5,8 @@ example-simple:
 example-pad:
 	@node_modules/.bin/beefy example/pad.js -- -t brfs
 
-.PHONY: example-simple example-pad
+example-special-chars:
+	@node_modules/.bin/beefy example/special-chars.js -- -t brfs
+
+.PHONY: example-simple example-pad example-special-chars
 

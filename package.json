@@ -23,7 +23,7 @@
     "binary-shannon-entropy": "^1.1.2",
     "colorcoded-bar": "^2.3.0",
     "fill-colorcoded-bar": "^1.0.5",
-    "generic-hex-dump": "^1.1.0",
+    "generic-hex-dump": "^1.2.0",
     "hyperscript": "^1.4.7",
     "insert-css": "^0.2.0",
     "raf": "^3.1.0"

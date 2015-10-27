@@ -14,8 +14,10 @@ module.exports = Dump;
 function Dump(store, length){
   insertCSS(style);
 
-  this._store = store;
   this._generic = new GenericDump(length);
+  this._generic.replace('\n', '↵');
+
+  this._store = store;
   this._el = null;
   this._gutterWidth = 4;
   this._offsetWidth = this._generic.offsetWidth();
