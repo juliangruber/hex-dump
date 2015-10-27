@@ -84,7 +84,7 @@ Dump.prototype._render = function(height){
 Dump.prototype._renderHex = function(line, buf){
   return [
     this._generic.offset(line),
-    this._generic.hex(buf).join(' '),
+    pad(this._generic.hex(buf).join(' '), 48 /* 3x16 */),
     this._generic.strings(buf).join(' ')
   ].join(this._gutter()) + '\n';
 };
@@ -125,5 +125,12 @@ function cap(min, max, num){
 function spaces(n){
   var out = '';
   for (var i = 0; i < n; i++) out += ' ';
+  return out;
+}
+
+function pad(str, len){
+  var out = str;
+  var dif = len - str.length;
+  for (var i = 0; i < dif; i++) out += ' ';
   return out;
 }
