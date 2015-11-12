@@ -60,22 +60,23 @@ Dump.prototype._render = function(height){
     if (status.fetching) raf(draw);
   })();
 
-  var out = '';
+  var frag = document.createDocumentFragment();
 
   (function next(i){
     self._store.get(i, { length: self._lineLength(i) }, function(err, buf){
       if (err) throw err;
 
-      out += self._renderHex(i, buf);
+      frag.appendChild(self._renderHex(i, buf));
+
       if (i % 5 == 0) {
-        pre.innerHTML += out;
-        out = '';
+        pre.appendChild(frag);
+        frag = document.createDocumentFragment();
       }
 
       if (++i < self._lines) {
         next(i);
       } else {
-        pre.innerHTML += out;
+        pre.appendChild(frag);
       }
     });
   })(0);
@@ -84,11 +85,17 @@ Dump.prototype._render = function(height){
 };
 
 Dump.prototype._renderHex = function(line, buf){
-  return [
-    this._generic.offset(line),
-    pad(this._generic.hex(buf).join(' '), 48 /* 3x16 */),
-    this._generic.strings(buf).join(' ')
-  ].join(this._gutter()) + '\n';
+  var frag = document.createDocumentFragment();
+  frag.appendChild(document.createTextNode(
+    this._generic.offset(line) + this._gutter()
+  ));
+  frag.appendChild(document.createTextNode(
+    pad(this._generic.hex(buf).join(' '), 48 /* 3x16 */) + this._gutter()   
+  ));
+  frag.appendChild(document.createTextNode(
+    this._generic.strings(buf).join(' ') + this._gutter() + '\n'
+  ));
+  return frag;
 };
 
 Dump.prototype._gutter = function(){
