@@ -89,8 +89,8 @@ Dump.prototype._render = function(height){
 
     var target = ev.target;
     if (target.tagName != 'SPAN') return;
-    var sel = target.className.split(' ').map(function(cl){return '.'+cl}).join('');
-    var els = pre.querySelectorAll(sel);
+
+    var els = pre.querySelectorAll('.' + target.className);
     for (var i = 0; i < els.length; i++) {
       els[i].classList.add('selected');
     }
@@ -101,11 +101,13 @@ Dump.prototype._render = function(height){
 
 Dump.prototype._renderHex = function(line, buf){
   var frag = document.createDocumentFragment();
+  var hexValues = this._generic.hex(buf);
+
   frag.appendChild(txt(
     this._generic.offset(line) + this._gutter()
   ));
-  this._generic.hex(buf).forEach(function(hex, idx){
-    frag.appendChild(h('span.line-' + line + '.idx-' + idx, hex));
+  hexValues.forEach(function(hex){
+    frag.appendChild(h('span.hex-' + hex, hex));
     frag.appendChild(txt(' '));
   });
   if (buf.length < 16) {
@@ -116,7 +118,7 @@ Dump.prototype._renderHex = function(line, buf){
   frag.appendChild(txt(this._gutter()));
 
   this._generic.strings(buf).forEach(function(str, idx){
-    frag.appendChild(h('span.line-' + line + '.idx-' + idx, str));
+    frag.appendChild(h('span.hex-' + hexValues[idx], str));
     frag.appendChild(txt(' '));
   });
   frag.appendChild(txt('\n'));
