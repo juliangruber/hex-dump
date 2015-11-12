@@ -8,5 +8,8 @@ example-pad:
 example-special-chars:
 	@node_modules/.bin/beefy example/special-chars.js -- -t brfs
 
+example-small:
+	@node_modules/.bin/beefy example/small.js -- -t brfs
+
 .PHONY: example-simple example-pad example-special-chars
 
