@@ -31,6 +31,10 @@ $ npm install hex-dump
 
 ### #appendTo(el)
 
+### #getSelection(cb)
+
+  If the user has selected some data, call cb with `(err, buf)`, where `buf` is the slice of data selected.
+
 ## License
 
   MIT
