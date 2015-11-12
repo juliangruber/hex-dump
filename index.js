@@ -6,6 +6,7 @@ var h = require('hyperscript');
 var Bar = require('colorcoded-bar');
 var fill = require('fill-colorcoded-bar');
 var raf = require('raf');
+var debounce = require('debounce');
 
 var style = fs.readFileSync(__dirname + '/style.css', 'utf8');
 
@@ -81,7 +82,7 @@ Dump.prototype._render = function(height){
     });
   })(0);
 
-  pre.addEventListener('mousemove', function(ev){
+  pre.addEventListener('mousemove', debounce(function(ev){
     var selected = pre.querySelectorAll('.selected');
     for (var i = 0; i < selected.length; i++) {
       selected[i].classList.remove('selected');
@@ -90,11 +91,11 @@ Dump.prototype._render = function(height){
     var target = ev.target;
     if (target.tagName != 'SPAN') return;
 
-    var els = pre.querySelectorAll('.' + target.className);
-    for (var i = 0; i < els.length; i++) {
-      els[i].classList.add('selected');
+    var match = pre.querySelectorAll('.' + target.className);
+    for (var i = 0; i < match.length; i++) {
+      match[i].classList.add('selected');
     }
-  });
+  }, 10));
 
   return h('div.dump', barEl, pre);
 };
