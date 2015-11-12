@@ -7,6 +7,7 @@ var Bar = require('colorcoded-bar');
 var fill = require('fill-colorcoded-bar');
 var raf = require('raf');
 var debounce = require('debounce');
+var multiget = require('chunk-store-multi-get');
 
 var style = fs.readFileSync(__dirname + '/style.css', 'utf8');
 
@@ -107,8 +108,11 @@ Dump.prototype._renderHex = function(line, buf){
   frag.appendChild(txt(
     this._generic.offset(line) + this._gutter()
   ));
-  hexValues.forEach(function(hex){
-    frag.appendChild(h('span.hex-' + hex, hex));
+  hexValues.forEach(function(hex, idx){
+    frag.appendChild(h('span.hex-' + hex,
+      { 'data-offset': line*16+idx },
+      hex
+    ));
     frag.appendChild(txt(' '));
   });
   if (buf.length < 16) {
@@ -119,7 +123,10 @@ Dump.prototype._renderHex = function(line, buf){
   frag.appendChild(txt(this._gutter()));
 
   this._generic.strings(buf).forEach(function(str, idx){
-    frag.appendChild(h('span.hex-' + hexValues[idx], str));
+    frag.appendChild(h('span.hex-' + hexValues[idx],
+      { 'data-offset': line*16+idx },
+      str
+    ));
     frag.appendChild(txt(' '));
   });
   frag.appendChild(txt('\n'));
@@ -135,23 +142,28 @@ Dump.prototype._gutter = function(){
   return spaces(this._gutterWidth);
 };
 
-Dump.prototype.getSelection = function(){
+Dump.prototype.getSelection = function(cb){
   var sel = getSelection();
-  if (sel.type != 'Range' || sel.anchorNode.parentNode != this._el) return;
+  if (sel.type != 'Range') return;
 
-  var start = {};
-  start.offset = Math.min(sel.baseOffset, sel.extentOffset);
-  start.line = Math.floor(start.offset / this._lineWidth);
-  start.lineOffset = cap(0, 3 * 16, start.offset % (this._lineWidth + 1 /* \n */) - this._offsetWidth - this._gutterWidth);
-  start.idx = Math.ceil((start.line * 16 + (start.lineOffset / 3)));
+  var anchor = sel.anchorNode.parentNode.tagName == 'SPAN'
+    ? sel.anchorNode.parentNode
+    : sel.anchorNode.nextSibling;
+  var focus = sel.focusNode.parentNode.tagName == 'SPAN'
+    ? sel.focusNode.parentNode
+    : sel.focusNode.previousSibling;
+  var start = anchor.dataset.offset;
+  var end = focus.dataset.offset;
 
-  var end = {};
-  end.offset = Math.max(sel.baseOffset, sel.extentOffset);
-  end.line = Math.floor(end.offset / (this._lineWidth));
-  end.lineOffset = cap(0, 3 * 16, end.offset % (this._lineWidth + 1 /* \n */) - this._offsetWidth - this._gutterWidth - 1);
-  end.idx = Math.ceil((end.line * 16 + (end.lineOffset / 3)));
+  var index = Math.floor(start / 16);
+  var offset = start - index * 16;
 
-  return this._buf.slice(start.idx, end.idx);
+  multiget(this._store, {
+    index: index,
+    offset: offset,
+    length: end - start + 1,
+    chunkLength: 16
+  }, cb);
 };
 
 Dump.prototype._lineLength = function(i){
