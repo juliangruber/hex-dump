@@ -81,22 +81,52 @@ Dump.prototype._render = function(height){
     });
   })(0);
 
+  pre.addEventListener('mousemove', function(ev){
+    var selected = pre.querySelectorAll('.selected');
+    for (var i = 0; i < selected.length; i++) {
+      selected[i].classList.remove('selected');
+    }
+
+    var target = ev.target;
+    if (target.tagName != 'SPAN') return;
+    var sel = target.className.split(' ').map(function(cl){return '.'+cl}).join('');
+    var els = pre.querySelectorAll(sel);
+    for (var i = 0; i < els.length; i++) {
+      els[i].classList.add('selected');
+    }
+  });
+
   return h('div.dump', barEl, pre);
 };
 
 Dump.prototype._renderHex = function(line, buf){
   var frag = document.createDocumentFragment();
-  frag.appendChild(document.createTextNode(
+  frag.appendChild(txt(
     this._generic.offset(line) + this._gutter()
   ));
-  frag.appendChild(document.createTextNode(
-    pad(this._generic.hex(buf).join(' '), 48 /* 3x16 */) + this._gutter()   
-  ));
-  frag.appendChild(document.createTextNode(
-    this._generic.strings(buf).join(' ') + this._gutter() + '\n'
-  ));
+  this._generic.hex(buf).forEach(function(hex, idx){
+    frag.appendChild(h('span.line-' + line + '.idx-' + idx, hex));
+    frag.appendChild(txt(' '));
+  });
+  if (buf.length < 16) {
+    for (var i = 0; i < 16 - buf.length; i++) {
+      frag.appendChild(txt('00 '));
+    }
+  }
+  frag.appendChild(txt(this._gutter()));
+
+  this._generic.strings(buf).forEach(function(str, idx){
+    frag.appendChild(h('span.line-' + line + '.idx-' + idx, str));
+    frag.appendChild(txt(' '));
+  });
+  frag.appendChild(txt('\n'));
+
   return frag;
 };
+
+function txt(s){
+  return document.createTextNode(s);
+}
 
 Dump.prototype._gutter = function(){
   return spaces(this._gutterWidth);
