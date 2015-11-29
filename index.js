@@ -8,6 +8,7 @@ var fill = require('fill-colorcoded-bar');
 var raf = require('raf');
 var debounce = require('debounce');
 var multiget = require('chunk-store-multi-get');
+var CacheChunkStore = require('cache-chunk-store');
 
 var style = fs.readFileSync(__dirname + '/style.css', 'utf8');
 
@@ -19,7 +20,9 @@ function Dump(store, length){
   this._generic = new GenericDump(length);
   this._generic.replace('\n', '↵');
 
-  this._store = store;
+  this._store = new CacheChunkStore(store, {
+    max: 100
+  });
   this._el = null;
   this._gutterWidth = 4;
   this._offsetWidth = this._generic.offsetWidth();
