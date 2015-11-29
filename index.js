@@ -182,9 +182,3 @@ function spaces(n){
   return out;
 }
 
-function pad(str, len){
-  var out = str;
-  var dif = len - str.length;
-  for (var i = 0; i < dif; i++) out += ' ';
-  return out;
-}
