@@ -105,9 +105,8 @@ Dump.prototype._renderHex = function(line, buf){
   var frag = document.createDocumentFragment();
   var hexValues = this._generic.hex(buf);
 
-  frag.appendChild(txt(
-    this._generic.offset(line) + this._gutter()
-  ));
+  frag.appendChild(txt(this._generic.offset(line)));
+  frag.appendChild(txt(this._gutter()));
   hexValues.forEach(function(hex, idx){
     frag.appendChild(h('span.hex-' + hex,
       { 'data-offset': line*16+idx },
