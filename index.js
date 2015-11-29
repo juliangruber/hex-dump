@@ -135,16 +135,6 @@ Dump.prototype._renderHex = function(line, buf){
   return frag;
 };
 
-function txt(s){
-  return document.createTextNode(s);
-}
-
-Dump.prototype._gutter = function(){
-  var out = '';
-  for (var i = 0; i < this._gutterWidth; i++) out += ' ';
-  return out;
-};
-
 Dump.prototype.getSelection = function(cb){
   var sel = getSelection();
   if (sel.type != 'Range') return;
@@ -174,4 +164,14 @@ Dump.prototype._lineLength = function(i){
     ? this._lastChunkLength
     : 16;
 };
+
+Dump.prototype._gutter = function(){
+  var out = '';
+  for (var i = 0; i < this._gutterWidth; i++) out += ' ';
+  return out;
+};
+
+function txt(s){
+  return document.createTextNode(s);
+}
 
