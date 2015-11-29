@@ -83,7 +83,13 @@ Dump.prototype._render = function(height){
     });
   })(0);
 
-  pre.addEventListener('mousemove', debounce(function(ev){
+  pre.addEventListener('mousemove', this._onmousemove(pre));
+
+  return h('div.dump', barEl, pre);
+};
+
+Dump.prototype._onmousemove = function(pre){
+  return debounce(function(ev){
     var selected = pre.querySelectorAll('.selected');
     for (var i = 0; i < selected.length; i++) {
       selected[i].classList.remove('selected');
@@ -96,9 +102,7 @@ Dump.prototype._render = function(height){
     for (var i = 0; i < match.length; i++) {
       match[i].classList.add('selected');
     }
-  }, 10));
-
-  return h('div.dump', barEl, pre);
+  }, 10);
 };
 
 Dump.prototype._renderHex = function(line, buf){
