@@ -174,7 +174,3 @@ Dump.prototype._lineLength = function(i){
     : 16;
 };
 
-function cap(min, max, num){
-  return Math.min(max, Math.max(min, num));
-}
-
