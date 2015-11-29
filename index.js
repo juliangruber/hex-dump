@@ -139,7 +139,9 @@ function txt(s){
 }
 
 Dump.prototype._gutter = function(){
-  return spaces(this._gutterWidth);
+  var out = '';
+  for (var i = 0; i < this._gutterWidth; i++) out += ' ';
+  return out;
 };
 
 Dump.prototype.getSelection = function(cb){
@@ -174,11 +176,5 @@ Dump.prototype._lineLength = function(i){
 
 function cap(min, max, num){
   return Math.min(max, Math.max(min, num));
-}
-
-function spaces(n){
-  var out = '';
-  for (var i = 0; i < n; i++) out += ' ';
-  return out;
 }
 
