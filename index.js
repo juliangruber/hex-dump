@@ -115,7 +115,7 @@ Dump.prototype._renderHex = function(line, buf){
     frag.appendChild(txt(' '));
   });
   for (var i = 0; i < 16 - buf.length; i++) {
-    frag.appendChild(txt('00 '));
+    frag.appendChild(txt('   '));
   }
   frag.appendChild(txt(this._gutter()));
 
