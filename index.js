@@ -115,10 +115,8 @@ Dump.prototype._renderHex = function(line, buf){
     ));
     frag.appendChild(txt(' '));
   });
-  if (buf.length < 16) {
-    for (var i = 0; i < 16 - buf.length; i++) {
-      frag.appendChild(txt('00 '));
-    }
+  for (var i = 0; i < 16 - buf.length; i++) {
+    frag.appendChild(txt('00 '));
   }
   frag.appendChild(txt(this._gutter()));
 
