@@ -32,11 +32,21 @@ function Dump(store, length){
     + 2 * this._gutterWidth
     + 4 * 16;
   this._lastChunkLength = length % 16 || 16;
+  this._pageIdx = 0;
+  this._pageSize = 100;
+  this._pageBytes = this._pageSize * 16;
+  this._lastPageBytes = length % this._pageBytes || this._pageBytes;
+  this._lastPageIdx = Math.floor(length / this._pageBytes);
+  this._el = null;
+  this._scrollBuf = 100;
+  this._fetching = false;
 }
 
 Dump.prototype.appendTo = function(el){
   var height = el.getClientRects()[0].height;
-  el.appendChild(this._render(height));
+  this._el = this._render(height);
+  el.appendChild(this._el);
+  this._fetch(0);
 };
 
 Dump.prototype._render = function(height){
@@ -65,30 +75,54 @@ Dump.prototype._render = function(height){
     if (status.fetching) raf(draw);
   })();
 
-  var frag = document.createDocumentFragment();
-
-  (function next(i){
-    self._store.get(i, { length: self._lineLength(i) }, function(err, buf){
-      if (err) throw err;
-
-      frag.appendChild(self._renderHex(i, buf));
-
-      if (i % 5 == 0) {
-        pre.appendChild(frag);
-        frag = document.createDocumentFragment();
-      }
-
-      if (++i < self._lines) {
-        next(i);
-      } else {
-        pre.appendChild(frag);
-      }
-    });
-  })(0);
-
   pre.addEventListener('mousemove', this._onmousemove(pre));
+  pre.addEventListener('scroll', this._onscroll(pre));
 
-  return h('div.dump', barEl, pre);
+  return h('div.dump', { onscroll: onscroll }, barEl, pre);
+};
+
+Dump.prototype._fetch = function(pageIdx){
+  var self = this;
+  if (pageIdx > this._lastPageIdx) return;
+
+  this._fetching = true;
+  var length = pageIdx == this._lastPageIdx
+    ? this._lastPageBytes
+    : this._pageBytes;
+
+  multiget(this._store, {
+    index: pageIdx * this._pageSize,
+    length: length,
+    chunkLength: 16
+  }, function(err, data){
+    self._fetching = false;
+    if (err) throw err;
+
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < self._pageSize; i++) {
+      if (i * 16 >= data.length) break;
+      var slice = data.slice(i * 16, (i+1) * 16);
+      frag.appendChild(self._renderHex(i, slice));
+    }
+
+    self._el.querySelector('pre').appendChild(frag);
+  });
+};
+
+Dump.prototype._more = function(){
+  this._fetch(++this._pageIdx);
+};
+
+Dump.prototype._onscroll = function(pre){
+  var self = this;
+  return function(ev){
+    if (self._fetching) return;
+    var more =
+      pre.scrollTop + pre.offsetHeight
+      >=
+      pre.scrollHeight - self._scrollBuf;
+    if (more) self._more();
+  };
 };
 
 Dump.prototype._onmousemove = function(pre){
