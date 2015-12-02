@@ -89,6 +89,12 @@ Dump.prototype._fetch = function(pageIdx){
   var length = pageIdx == this._lastPageIdx
     ? this._lastPageBytes
     : this._pageBytes;
+  var pre = this._el.querySelector('pre');
+  var tmp = h('div');
+  for (var i = 0; i < self._pageSize; i++) {
+    tmp.appendChild(h('br'));
+  }
+  pre.appendChild(tmp);
 
   multiget(this._store, {
     index: pageIdx * this._pageSize,
@@ -104,8 +110,7 @@ Dump.prototype._fetch = function(pageIdx){
       var slice = data.slice(i * 16, (i+1) * 16);
       frag.appendChild(self._renderHex(i, slice));
     }
-
-    self._el.querySelector('pre').appendChild(frag);
+    pre.replaceChild(frag, tmp);
   });
 };
 
