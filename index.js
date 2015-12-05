@@ -9,6 +9,7 @@ var raf = require('raf');
 var debounce = require('debounce');
 var multiget = require('chunk-store-multi-get');
 var CacheChunkStore = require('cache-chunk-store');
+var HugeTextView = require('huge-text-view');
 
 var style = fs.readFileSync(__dirname + '/style.css', 'utf8');
 
@@ -32,29 +33,32 @@ function Dump(store, length){
     + 2 * this._gutterWidth
     + 4 * 16;
   this._lastChunkLength = length % 16 || 16;
-  this._pageIdx = 0;
-  this._pageSize = 100;
-  this._pageBytes = this._pageSize * 16;
-  this._lastPageBytes = length % this._pageBytes || this._pageBytes;
-  this._lastPageIdx = Math.floor(length / this._pageBytes);
   this._el = null;
-  this._scrollBuf = 100;
-  this._fetching = false;
+
+  var self = this;
+  this._textView = HugeTextView()
+    .lines(this._lines)
+    .pad(100)
+    .fetch(function(idx, cb){
+      self._store.get(idx, function(err, buf){
+        if (err) return cb(err);
+        cb(null, h('pre', self._renderHex(idx, buf)));
+      });
+    });
 }
 
 Dump.prototype.appendTo = function(el){
   var height = el.getClientRects()[0].height;
   this._el = this._render(height);
   el.appendChild(this._el);
-  this._fetch(0);
 };
 
 Dump.prototype._render = function(height){
   var self = this;
 
   var canvas = h('canvas');
-  var pre = h('pre.hex');
   var barEl = h('div.entropy', canvas);
+  var dataEl = h('div.data');
 
   var bar = new Bar;
   var status = fill(bar, {
@@ -75,59 +79,9 @@ Dump.prototype._render = function(height){
     if (status.fetching) raf(draw);
   })();
 
-  pre.addEventListener('mousemove', this._onmousemove(pre));
-  pre.addEventListener('scroll', this._onscroll(pre));
+  this._textView.render(dataEl);
 
-  return h('div.dump', { onscroll: onscroll }, barEl, pre);
-};
-
-Dump.prototype._fetch = function(pageIdx){
-  var self = this;
-  if (pageIdx > this._lastPageIdx) return;
-
-  this._fetching = true;
-  var length = pageIdx == this._lastPageIdx
-    ? this._lastPageBytes
-    : this._pageBytes;
-  var pre = this._el.querySelector('pre');
-  var tmp = h('div');
-  for (var i = 0; i < self._pageSize; i++) {
-    tmp.appendChild(h('br'));
-  }
-  pre.appendChild(tmp);
-
-  multiget(this._store, {
-    index: pageIdx * this._pageSize,
-    length: length,
-    chunkLength: 16
-  }, function(err, data){
-    self._fetching = false;
-    if (err) throw err;
-
-    var frag = document.createDocumentFragment();
-    for (var i = 0; i < self._pageSize; i++) {
-      if (i * 16 >= data.length) break;
-      var slice = data.slice(i * 16, (i+1) * 16);
-      frag.appendChild(self._renderHex(i, slice));
-    }
-    pre.replaceChild(frag, tmp);
-  });
-};
-
-Dump.prototype._more = function(){
-  this._fetch(++this._pageIdx);
-};
-
-Dump.prototype._onscroll = function(pre){
-  var self = this;
-  return function(ev){
-    if (self._fetching) return;
-    var more =
-      pre.scrollTop + pre.offsetHeight
-      >=
-      pre.scrollHeight - self._scrollBuf;
-    if (more) self._more();
-  };
+  return h('div.dump', barEl, dataEl);
 };
 
 Dump.prototype._onmousemove = function(pre){

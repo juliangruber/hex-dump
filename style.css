@@ -1,18 +1,14 @@
 .dump {
   position: relative;
   height: 100%;
+  overflow: auto;
 }
 
 .dump .entropy {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
+  position: fixed;
 }
 
-.dump .hex {
-  overflow: auto;
-  height: 100%;
+.dump .data {
   margin-left: 150px;
 }
 
