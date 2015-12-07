@@ -3,6 +3,14 @@
 
   Simplisitc hex dump for browsers.
 
+## Features
+
+- shows byte offset, hex values and strings
+- entropy bar
+- text selection with .getSelection
+- highlights same values
+- lazily loads binaries of arbitrary sizes
+
 ## Example
 
   ![screenshot](screenshot.png)
