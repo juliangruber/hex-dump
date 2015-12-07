@@ -29,6 +29,7 @@ var server = http.createServer(function(req, res){
 websocket.createServer({
   server: server
 }, function (con){
+  con.on('error', console.error);
   con.pipe(transport.server(store)).pipe(con);
 });
 
