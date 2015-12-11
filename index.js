@@ -42,7 +42,12 @@ function Dump(store, length){
     .fetch(function(idx, cb){
       self._store.get(idx, function(err, buf){
         if (err) return cb(err);
-        cb(null, h('pre', self._renderHex(idx, buf)));
+        var el = h('pre',
+          { onmousemove: self._onmousemove(self._el) },
+          self._renderHex(idx, buf)
+        );
+        el.style.position = 'absolute';
+        cb(null, el);
       });
     });
 }
@@ -84,9 +89,9 @@ Dump.prototype._render = function(height){
   return h('div.dump', barEl, dataEl);
 };
 
-Dump.prototype._onmousemove = function(pre){
+Dump.prototype._onmousemove = function(el){
   return debounce(function(ev){
-    var selected = pre.querySelectorAll('.selected');
+    var selected = el.querySelectorAll('.selected');
     for (var i = 0; i < selected.length; i++) {
       selected[i].classList.remove('selected');
     }
@@ -94,7 +99,7 @@ Dump.prototype._onmousemove = function(pre){
     var target = ev.target;
     if (target.tagName != 'SPAN') return;
 
-    var match = pre.querySelectorAll('.' + target.className);
+    var match = el.querySelectorAll('.' + target.className);
     for (var i = 0; i < match.length; i++) {
       match[i].classList.add('selected');
     }
