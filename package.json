@@ -1,6 +1,6 @@
 {
   "name": "hex-dump",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "description": "Simplistic hex dumps for browsers",
   "scripts": {
     "test": "make test"
@@ -33,6 +33,8 @@
     "raf": "^3.1.0"
   },
   "browserify": {
-    "transform": ["brfs"]  
+    "transform": [
+      "brfs"
+    ]
   }
 }
