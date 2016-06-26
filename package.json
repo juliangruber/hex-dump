@@ -29,7 +29,7 @@
     "generic-hex-dump": "^1.2.0",
     "huge-text-view": "^1.1.0",
     "hyperscript": "^1.4.7",
-    "insert-css": "^0.2.0",
+    "insert-css": "^1.0.0",
     "raf": "^3.2.0"
   },
   "browserify": {
