@@ -9,7 +9,7 @@
   "devDependencies": {
     "abstract-chunk-transport": "^2.0.0",
     "beefy": "^2.1.6",
-    "browserify": "^12.0.1",
+    "browserify": "^13.1.0",
     "bytes": "^2.1.0",
     "entropy-buffer": "^1.0.0",
     "fs-chunk-store": "^1.6.3",
