@@ -21,7 +21,7 @@
   "dependencies": {
     "binary-shannon-entropy": "^1.1.2",
     "brfs": "^1.4.2",
-    "cache-chunk-store": "^1.0.2",
+    "cache-chunk-store": "^1.1.0",
     "chunk-store-multi-get": "^1.2.0",
     "colorcoded-bar": "^2.3.0",
     "debounce": "^1.0.0",
