@@ -15,7 +15,7 @@
     "fs-chunk-store": "^1.6.3",
     "memory-chunk-store": "^1.2.0",
     "random-buffer": "^0.1.0",
-    "websocket-stream": "^2.1.0"
+    "websocket-stream": "^3.3.0"
   },
   "license": "MIT",
   "dependencies": {
